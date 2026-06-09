@@ -1,49 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FF0000"
-    android:gravity="center"
-    android:orientation="vertical"
+    android:background="@color/alert_bg_red"
     android:padding="24dp">
 
+    <!-- 경고 아이콘 -->
+    <ImageView
+        android:id="@+id/ivAlertIcon"
+        android:layout_width="140dp"
+        android:layout_height="140dp"
+        android:layout_marginTop="40dp"
+        android:contentDescription="@string/content_description_alert_icon"
+        android:src="@android:drawable/ic_dialog_alert"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white" />
+
+    <!-- 메인 타이틀 -->
     <TextView
         android:id="@+id/tvAlertTitle"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="⚠️ 위험! 피싱 문자 의심"
-        android:textColor="#FFFFFF"
-        android:textSize="40sp"
-        android:textStyle="bold" />
+        android:layout_marginTop="24dp"
+        android:gravity="center"
+        android:text="@string/alert_title"
+        android:textColor="@color/white"
+        android:textSize="38sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivAlertIcon" />
 
+    <!-- 탐지 사유 -->
     <TextView
         android:id="@+id/tvAlertReason"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="탐지 사유"
-        android:textColor="#FFFFFF"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+        android:layout_marginTop="32dp"
+        android:gravity="center"
+        android:lineSpacingExtra="8dp"
+        android:textColor="@color/white"
+        android:textSize="26sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvAlertTitle"
+        tools:text="탐지 사유: 피싱 의심 단어 포함" />
 
+    <!-- 발신자 정보 -->
     <TextView
-        android:id="@+id/tvAlertMessage"
+        android:id="@+id/tvSenderInfo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="22sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvAlertReason"
+        tools:text="보낸 사람: 010-1234-5678" />
+
+    <!-- 문자 내용 요약 -->
+    <TextView
+        android:id="@+id/tvMessageContent"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="3"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvSenderInfo"
+        tools:text="문자 내용: [국제발신] 해외결제 승인..." />
+
+    <!-- 안전한 닫기 버튼 (주요 행동) -->
+    <Button
+        android:id="@+id/btnSafeClose"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/btn_safe_green"
+        android:text="@string/btn_close"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/btnOpen"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- 위험 무시 버튼 (부차적 행동) -->
+    <Button
+        android:id="@+id/btnOpen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="방금 온 문자에 위험한 링크나 단어가 포함되어 있습니다.\n절대로 클릭하지 마세요!"
-        android:textColor="#FFFFFF"
-        android:textSize="28sp"
-        android:gravity="center" />
+        android:layout_marginBottom="24dp"
+        android:background="@android:color/transparent"
+        android:text="@string/btn_open"
+        android:textColor="@color/btn_danger_grey"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <Button
-        android:id="@+id/btnClose"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_marginTop="50dp"
-        android:backgroundTint="#000000"
-        android:text="확인했습니다 (닫기)"
-        android:textColor="#FFFFFF"
-        android:textSize="32sp"
-        android:textStyle="bold" />
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

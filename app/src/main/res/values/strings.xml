@@ -1,3 +1,21 @@
 <resources>
-    <string name="app_name">Sliver_guard</string>
+    <string name="app_name">실버가드 (피싱방지)</string>
+
+    <!-- 어르신 경고 화면용 (쉬운 한국어) -->
+    <string name="alert_title">위험한 문자예요!</string>
+    <string name="alert_desc">이 문자는 사기(피싱)일 수 있어요.</string>
+    <string name="btn_close">열지 않기 (안전)</string>
+    <string name="btn_open">그래도 열기</string>
+
+    <!-- 되묻기 다이얼로그용 -->
+    <string name="confirm_title">정말 여시겠어요?</string>
+    <string name="confirm_msg">이 인터넷 주소는 가짜일 수 있어요. 돈을 잃을 수 있어요.</string>
+    <string name="confirm_yes">네, 열게요</string>
+    <string name="confirm_no">아니요</string>
+
+    <!-- 데이터 레이블 -->
+    <string name="label_reason">이유: %1$s</string>
+    <string name="label_sender">보낸 사람: %1$s</string>
+    <string name="label_content">내용: %1$s</string>
+    <string name="content_description_alert_icon">위험 경고 아이콘</string>
 </resources>

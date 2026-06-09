@@ -1,30 +1,87 @@
 package com.angae.phishingdefender.ui.alert
 
+import android.app.AlertDialog
+import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.angae.phishingdefender.databinding.ActivityAlertBinding
+import com.angae.phishingdefender.domain.notifier.GuardianNotifier
 
 /**
- * [SRP] 피싱 위협을 어르신들에게 시각적으로 강력하게 경고하는 화면.
+ * [SRP] 피싱 위험을 어르신에게 경고하고, 사용자의 최종 선택에 따라 후속 조치를 실행하는 화면.
  */
 class AlertActivity : AppCompatActivity() {
+
     private lateinit var binding: ActivityAlertBinding
+
+    // [DIP] 실제 알림 구현이 아닌 인터페이스에 의존.
+    private var guardianNotifier: GuardianNotifier? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
-        // ViewBinding 사용 (findViewById 금지 원칙 준수)
+
         binding = ActivityAlertBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // [SRP] 잠금화면 위에서도 뜨도록 설정 (API 27 O_MR1 이상 대응)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(true)
+            setTurnScreenOn(true)
+        }
+
+        setupDisplay()
+        setupListeners()
+    }
+
+    private fun setupDisplay() {
         val sender = intent.getStringExtra("sender") ?: "알 수 없는 번호"
+        val body = intent.getStringExtra("body") ?: ""
         val reason = intent.getStringExtra("reason") ?: "의심스러운 패턴 발견"
+        val matched = intent.getStringArrayListExtra("matched") ?: arrayListOf<String>()
+
+        binding.tvSenderInfo.text = getString(com.angae.phishingdefender.R.string.label_sender, sender)
+        binding.tvAlertReason.text = getString(com.angae.phishingdefender.R.string.label_reason, reason)
+        binding.tvMessageContent.text = getString(com.angae.phishingdefender.R.string.label_content, body)
         
-        binding.tvAlertReason.text = "사유: $reason"
-        
-        // 어르신들이 실수로 닫지 않도록 확인 버튼만 크게 배치
-        binding.btnClose.setOnClickListener {
+        if (matched.isNotEmpty()) {
+            binding.tvAlertReason.append("\n(위험 단어: ${matched.joinToString(", ")})")
+        }
+    }
+
+    private fun setupListeners() {
+        // 가장 안전한 동작(닫기)
+        binding.btnSafeClose.setOnClickListener {
             finish()
         }
+
+        // 위험한 동작(열기) 시 시니어 맞춤형 되묻기 다이얼로그
+        binding.btnOpen.setOnClickListener {
+            showDoubleCheckDialog()
+        }
+    }
+
+    private fun showDoubleCheckDialog() {
+        AlertDialog.Builder(this)
+            .setTitle(getString(com.angae.phishingdefender.R.string.confirm_title))
+            .setMessage(getString(com.angae.phishingdefender.R.string.confirm_msg))
+            .setPositiveButton(getString(com.angae.phishingdefender.R.string.confirm_yes)) { _, _ ->
+                handleFinalOpen()
+            }
+            .setNegativeButton(getString(com.angae.phishingdefender.R.string.confirm_no)) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun handleFinalOpen() {
+        val sender = intent.getStringExtra("sender") ?: "Unknown"
+        val body = intent.getStringExtra("body") ?: ""
+        val reason = intent.getStringExtra("reason") ?: "Unknown"
+
+        // [DIP] 보호자에게 알림 발송 트리거
+        guardianNotifier?.notifyGuardian(sender, body, reason)
+        
+        finish()
     }
 }
