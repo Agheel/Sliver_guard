@@ -1,14 +1,16 @@
 package com.angae.phishingdefender.domain.notifier
 
 /**
- * [DIP] 보호자에게 알림을 보내는 고수준 정책 인터페이스.
- * 실제 FCM 발송이나 SMS 발송 등의 상세 구현은 이 인터페이스를 구현하는 클래스에서 담당함.
+ * [DIP] 보호자 알림 정책의 추상화.
+ * 상세 구현(서버 전송, FCM 등)은 데이터 레이어에서 담당하며, 도메인은 이 규격만 알고 있음.
  */
 interface GuardianNotifier {
     /**
-     * @param sender 피싱 문자 발신자
-     * @param body 피싱 문자 내용
-     * @param reason 탐지 사유
+     * @return Result<Unit> 전송 성공 여부 및 에러를 캡슐화하여 반환
      */
-    fun notifyGuardian(sender: String, body: String, reason: String)
+    suspend fun notifyGuardian(
+        sender: String,
+        body: String,
+        reason: String
+    ): Result<Unit>
 }

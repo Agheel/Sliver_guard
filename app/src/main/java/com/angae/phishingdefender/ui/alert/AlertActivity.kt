@@ -5,7 +5,13 @@ import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.angae.phishingdefender.databinding.ActivityAlertBinding
-import com.angae.phishingdefender.domain.notifier.GuardianNotifier
+import com.example.sliver_guard.domain.notifier.GuardianNotifier
+import com.example.sliver_guard.data.notifier.FirestoreGuardianNotifier
+import com.example.sliver_guard.domain.model.SmsMessage
+import com.google.firebase.firestore.FirebaseFirestore
+import android.provider.Settings
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 /**
  * [SRP] 피싱 위험을 어르신에게 경고하고, 사용자의 최종 선택에 따라 후속 조치를 실행하는 화면.
@@ -14,8 +20,10 @@ class AlertActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAlertBinding
 
-    // [DIP] 실제 알림 구현이 아닌 인터페이스에 의존.
-    private var guardianNotifier: GuardianNotifier? = null
+    // [DIP] 인터페이스에 의존하며, 구체적인 구현체(Firestore)를 주입받아 사용함.
+    private val guardianNotifier: GuardianNotifier by lazy { 
+        FirestoreGuardianNotifier(FirebaseFirestore.getInstance()) 
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,9 +86,14 @@ class AlertActivity : AppCompatActivity() {
         val sender = intent.getStringExtra("sender") ?: "Unknown"
         val body = intent.getStringExtra("body") ?: ""
         val reason = intent.getStringExtra("reason") ?: "Unknown"
+        val elderId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
 
-        // [DIP] 보호자에게 알림 발송 트리거
-        guardianNotifier?.notifyGuardian(sender, body, reason)
+        // [SRP] 알림 발송은 비동기로 처리하여 UI 흐름을 방해하지 않음
+        lifecycleScope.launch {
+            // [DIP] 인터페이스를 통해 알림 발송 호출 (세부 저장 로직은 몰라도 됨)
+            val smsMessage = SmsMessage(sender, body)
+            guardianNotifier.notifyGuardian(smsMessage, reason, elderId)
+        }
         
         finish()
     }
