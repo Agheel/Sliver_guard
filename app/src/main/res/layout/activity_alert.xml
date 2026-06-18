@@ -4,21 +4,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/alert_bg_red"
+    android:background="@color/guard_navy"
     android:padding="24dp">
+
+    <!-- Top Alert Stripe -->
+    <View
+        android:id="@+id/alertStripe"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:background="@color/guard_ruby"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- 경고 아이콘 -->
     <ImageView
         android:id="@+id/ivAlertIcon"
-        android:layout_width="140dp"
-        android:layout_height="140dp"
-        android:layout_marginTop="40dp"
-        android:contentDescription="@string/content_description_alert_icon"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="48dp"
+        android:contentDescription="경고 아이콘"
         android:src="@android:drawable/ic_dialog_alert"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/white" />
+        app:layout_constraintTop_toBottomOf="@id/alertStripe"
+        app:tint="@color/guard_ruby" />
 
     <!-- 메인 타이틀 -->
     <TextView
@@ -27,85 +37,128 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:gravity="center"
-        android:text="@string/alert_title"
-        android:textColor="@color/white"
-        android:textSize="38sp"
+        android:text="위험 감지됨"
+        android:textColor="@color/guard_off_white"
+        android:textSize="32sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ivAlertIcon" />
 
-    <!-- 탐지 사유 -->
-    <TextView
-        android:id="@+id/tvAlertReason"
+    <!-- 탐지 사유 카드 -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardReason"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:gravity="center"
-        android:lineSpacingExtra="8dp"
-        android:textColor="@color/white"
-        android:textSize="26sp"
-        android:textStyle="bold"
+        app:cardBackgroundColor="@color/guard_slate"
+        app:cardCornerRadius="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvAlertTitle"
-        tools:text="탐지 사유: 피싱 의심 단어 포함" />
+        app:strokeColor="@color/guard_ruby"
+        app:strokeWidth="1dp">
 
-    <!-- 발신자 정보 -->
-    <TextView
-        android:id="@+id/tvSenderInfo"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:id="@+id/tvAlertReason"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/guard_ruby"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                tools:text="사유: 보이스피싱 의심" />
+
+            <TextView
+                android:id="@+id/tvSenderInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/guard_off_white"
+                android:textSize="16sp"
+                tools:text="발신: 010-1234-5678" />
+
+            <TextView
+                android:id="@+id/tvMessageContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="#1AFFFFFF"
+                android:padding="12dp"
+                android:textColor="@color/guard_silver"
+                android:textSize="14sp"
+                tools:text="[국제발신] 해외결제 승인..." />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- 가이드 카드 -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardGuidance"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:gravity="center"
-        android:textColor="@color/white"
-        android:textSize="22sp"
+        android:layout_marginTop="20dp"
+        app:cardBackgroundColor="@color/guard_slate"
+        app:cardCornerRadius="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvAlertReason"
-        tools:text="보낸 사람: 010-1234-5678" />
+        app:layout_constraintTop_toBottomOf="@id/cardReason">
 
-    <!-- 문자 내용 요약 -->
-    <TextView
-        android:id="@+id/tvMessageContent"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:ellipsize="end"
-        android:gravity="center"
-        android:maxLines="3"
-        android:textColor="@color/white"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvSenderInfo"
-        tools:text="문자 내용: [국제발신] 해외결제 승인..." />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-    <!-- 안전한 닫기 버튼 (주요 행동) -->
-    <Button
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🛡️ 보안 가이드"
+                android:textColor="@color/guard_gold"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvGuidance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/guard_off_white"
+                android:textSize="14sp"
+                android:lineSpacingExtra="4dp"
+                tools:text="절대 링크를 누르지 마세요." />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- 안전한 닫기 버튼 -->
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnSafeClose"
         android:layout_width="0dp"
-        android:layout_height="100dp"
-        android:layout_marginBottom="16dp"
-        android:backgroundTint="@color/btn_safe_green"
-        android:text="@string/btn_close"
-        android:textColor="@color/white"
-        android:textSize="30sp"
+        android:layout_height="64dp"
+        android:layout_marginBottom="12dp"
+        android:backgroundTint="@color/guard_emerald"
+        android:text="안전하게 닫기"
+        android:textColor="@color/guard_navy"
+        android:textSize="18sp"
         android:textStyle="bold"
+        app:cornerRadius="12dp"
         app:layout_constraintBottom_toTopOf="@id/btnOpen"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- 위험 무시 버튼 (부차적 행동) -->
-    <Button
+    <!-- 위험 무시 버튼 -->
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnOpen"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:background="@android:color/transparent"
-        android:text="@string/btn_open"
-        android:textColor="@color/btn_danger_grey"
-        android:textSize="18sp"
+        android:layout_marginBottom="16dp"
+        android:text="위험 무시하고 열기"
+        android:textColor="@color/guard_silver"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

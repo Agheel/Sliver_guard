@@ -23,12 +23,16 @@ class FirestoreGuardianNotifier(private val context: Context) : GuardianNotifier
         reason: String
     ): Result<Unit> = withContext(Dispatchers.IO) {
         try {
-            // [SRP] 기기 고유 ID를 elderId로 사용 (MainActivity의 등록 정보와 일치시킴)
-            val elderId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+            val deviceId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+            
+            // [수정] MainActivity와 동일한 해시 기반 숫자 6자리 코드 생성
+            val hash = Math.abs(deviceId.hashCode())
+            val elderCode = (hash % 1000000).toString().padStart(6, '0')
 
             // 2. 전송할 데이터 맵 구성
             val alertData = hashMapOf(
-                "elderId" to elderId,
+                "elderId" to deviceId,
+                "elderCode" to elderCode,
                 "sender" to sender,
                 "body" to body,
                 "reason" to reason,

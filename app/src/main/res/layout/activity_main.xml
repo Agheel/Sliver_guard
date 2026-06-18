@@ -1,78 +1,262 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="24dp">
+    android:background="@color/guard_navy"
+    android:padding="20dp">
 
+    <!-- Header / Logo Area -->
     <TextView
+        android:id="@+id/tvLogo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="실버가드 대시보드"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+        android:layout_marginTop="16dp"
+        android:letterSpacing="0.2"
+        android:text="SLIVER GUARD"
+        android:textColor="@color/guard_gold"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- 역할 선택 영역 -->
+    <!-- Test Mode Button (Guardian only) -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnTestMode"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="테스트 모드"
+        android:textColor="@color/guard_gold"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="보안 대시보드"
+        android:textColor="@color/guard_off_white"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvLogo" />
+
+    <!-- Status Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        app:cardBackgroundColor="@color/guard_slate"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        app:strokeColor="@color/guard_silver"
+        app:strokeWidth="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <FrameLayout
+                android:layout_width="80dp"
+                android:layout_height="80dp">
+
+                <!-- Pulsing Background -->
+                <View
+                    android:id="@+id/viewPulse"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/pulse_circle"
+                    android:alpha="0.3" />
+
+                <ImageView
+                    android:id="@+id/ivGuardIcon"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center"
+                    android:src="@android:drawable/ic_lock_idle_lock"
+                    app:tint="@color/guard_gold" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tvStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="상태 로드 중..."
+                android:textColor="@color/guard_emerald"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvGuidance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="실시간 탐지 엔진이 작동 중입니다."
+                android:textColor="@color/guard_silver"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Simulation Button (Elderly mode only) -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnTestPhishing"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_marginTop="24dp"
+        android:backgroundTint="@color/guard_slate"
+        android:text="보안 기능 테스트 실행"
+        android:textColor="@color/guard_gold"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:cornerRadius="12dp"
+        app:layout_constraintTop_toBottomOf="@id/cardStatus"
+        app:strokeColor="@color/guard_gold"
+        app:strokeWidth="1dp" />
+
+    <!-- Linking Section (Guardian mode only) -->
     <LinearLayout
+        android:id="@+id/layoutLink"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:orientation="horizontal"
-        android:gravity="center">
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/cardStatus">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:baselineAligned="false"
+            android:layout_marginBottom="12dp">
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:hint="나는 어르신의"
+                android:textColorHint="@color/guard_silver"
+                app:boxBackgroundColor="@color/guard_slate"
+                app:boxStrokeColor="@color/guard_gold"
+                app:hintTextColor="@color/guard_gold">
+                <AutoCompleteTextView
+                    android:id="@+id/spinnerMyRole"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none"
+                    android:textColor="@color/guard_off_white"
+                    android:textSize="13sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:hint="보호 대상은 나의"
+                android:textColorHint="@color/guard_silver"
+                app:boxBackgroundColor="@color/guard_slate"
+                app:boxStrokeColor="@color/guard_gold"
+                app:hintTextColor="@color/guard_gold">
+                <AutoCompleteTextView
+                    android:id="@+id/spinnerTargetRole"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none"
+                    android:textColor="@color/guard_off_white"
+                    android:textSize="13sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="어르신 보호 번호 (6자리)"
+            app:boxBackgroundColor="@color/guard_slate"
+            app:boxStrokeColor="@color/guard_gold"
+            app:hintTextColor="@color/guard_gold"
+            android:textColorHint="@color/guard_silver"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etElderCode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:maxLength="6"
+                android:textColor="@color/guard_off_white" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLink"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="@color/guard_gold"
+            android:text="어르신 기기 연결하기"
+            android:textColor="@color/guard_navy"
+            android:textStyle="bold"
+            app:cornerRadius="12dp" />
+    </LinearLayout>
+
+    <!-- History Section -->
+    <LinearLayout
+        android:id="@+id/layoutHistory"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="32dp"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/btnDisconnect"
+        app:layout_constraintTop_toBottomOf="@id/layoutLink">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="앱 모드: "
-            android:textSize="18sp" />
+            android:text="최근 탐지 로그"
+            android:textColor="@color/guard_gold"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp" />
 
-        <RadioGroup
-            android:id="@+id/rgRole"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/rbElderly"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="어르신"
-                android:textSize="18sp" />
-
-            <RadioButton
-                android:id="@+id/rbGuardian"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="보호자"
-                android:textSize="18sp" />
-        </RadioGroup>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvHistory"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_alert_history" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/tvStatus"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnDisconnect"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="현재 탐지 엔진 작동 중"
-        android:textColor="#388E3C"
-        android:textSize="18sp" />
+        android:layout_marginBottom="8dp"
+        android:text="연결 해제"
+        android:textColor="@color/guard_ruby"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <Button
-        android:id="@+id/btnTestPhishing"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_marginTop="40dp"
-        android:text="[테스트] 피싱 문자 수신 시연"
-        android:textSize="20sp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:gravity="center"
-        android:text="위 버튼을 누르면\n어르신 경고 화면이 나타납니다."
-        android:textColor="#666666" />
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

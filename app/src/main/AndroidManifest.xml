@@ -11,6 +11,12 @@
     <!-- 안드로이드 13(API 33) 이상에서 보호자에게 알림을 보내기 위한 권한 -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- 배터리 최적화 제외 권한 (백그라운드 실행 보장) -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
+    <!-- 다른 앱 위에 표시 권한 (백그라운드에서 경고창 띄우기 필수) -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -36,7 +42,7 @@
             android:launchMode="singleInstance"
             android:showWhenLocked="true"
             android:turnScreenOn="true"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+            android:theme="@style/Theme.Sliver_guard" />
 
         <!-- SMS 수신 시 피싱 여부를 판별하는 리시버 -->
         <receiver

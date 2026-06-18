@@ -3,10 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="8dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="2dp">
+    android:layout_marginBottom="12dp"
+    app:cardBackgroundColor="@color/guard_slate"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/guard_silver"
+    app:strokeWidth="0.5dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,13 +22,21 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
+            <View
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_marginEnd="12dp"
+                android:background="@drawable/pulse_circle"
+                android:backgroundTint="@color/guard_ruby" />
+
             <TextView
                 android:id="@+id/tvHistorySender"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="010-1234-5678"
-                android:textSize="16sp"
+                android:textColor="@color/guard_off_white"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -34,7 +44,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="2024.06.12 14:30"
-                android:textColor="#888888"
+                android:textColor="@color/guard_silver"
                 android:textSize="12sp" />
         </LinearLayout>
 
@@ -42,11 +52,12 @@
             android:id="@+id/tvHistoryReason"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="6dp"
             android:text="피싱 의심 키워드 포함"
-            android:textColor="#E53935"
-            android:textSize="13sp"
-            android:textStyle="bold" />
+            android:textColor="@color/guard_ruby"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05" />
 
         <TextView
             android:id="@+id/tvHistoryBody"
@@ -54,10 +65,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:ellipsize="end"
-            android:maxLines="2"
+            android:maxLines="1"
             android:text="[국제발신] 해외결제 승인완료... 확인 바랍니다."
-            android:textColor="#444444"
-            android:textSize="14sp" />
+            android:textColor="@color/guard_silver"
+            android:textSize="13sp" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -10,9 +10,12 @@ import android.provider.Settings
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.angae.phishingdefender.ui.main.MainActivity
+import com.angae.phishingdefender.ui.alert.AlertActivity
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.DocumentChange
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
@@ -21,42 +24,92 @@ import com.google.firebase.messaging.RemoteMessage
  */
 class PhishingFcmService : FirebaseMessagingService() {
 
+    private var simulationListener: ListenerRegistration? = null
+
+    override fun onCreate() {
+        super.onCreate()
+        // [추가] 백그라운드에서도 시뮬레이션 명령(테스트 모드)을 감시함
+        startObservingSimulations()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        simulationListener?.remove()
+    }
+
+    private fun startObservingSimulations() {
+        if (com.angae.phishingdefender.BuildConfig.FLAVOR != "elderly") return
+
+        val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+        val hash = Math.abs(deviceId.hashCode())
+        val myId = (hash % 1000000).toString().padStart(6, '0')
+
+        simulationListener = FirebaseFirestore.getInstance().collection("simulations")
+            .whereEqualTo("elderCode", myId)
+            .addSnapshotListener { snapshots, e ->
+                if (e != null || snapshots == null) return@addSnapshotListener
+
+                for (dc in snapshots.documentChanges) {
+                    if (dc.type == DocumentChange.Type.ADDED) {
+                        val sender = dc.document.getString("sender") ?: "Unknown"
+                        val body = dc.document.getString("body") ?: ""
+                        val reason = dc.document.getString("reason") ?: "테스트 탐지"
+
+                        // 즉시 문서 삭제 (중복 방지)
+                        dc.document.reference.delete()
+
+                        // 백그라운드에서도 즉시 경고 화면 실행
+                        val intent = Intent(this, AlertActivity::class.java).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                            putExtra("sender", sender)
+                            putExtra("body", body)
+                            putExtra("reason", reason)
+                            putExtra("guidance", "이것은 가디언 앱에서 보낸 테스트용 메시지입니다.")
+                            putStringArrayListExtra("matched", arrayListOf(sender))
+                        }
+                        startActivity(intent)
+                    }
+                }
+            }
+    }
+
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        // [SRP] 새 토큰을 서버에 등록하는 로직 (기기 식별 및 푸시 전송용)
         updateTokenOnFirestore(token)
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
-        // [SRP] 메시지 데이터 추출 및 알림 표시 위임
-        val title = remoteMessage.data["title"] ?: "⚠️ 실버가드 긴급 알림"
+        if (com.angae.phishingdefender.BuildConfig.FLAVOR != "guardian") return
+
+        val title = remoteMessage.data["title"] ?: "🚨 긴급! 어르신 피싱 위협 감지"
         val message = remoteMessage.data["message"] ?: "어르신이 피싱 문자를 받았습니다!"
         
         showNotification(title, message)
     }
 
     private fun updateTokenOnFirestore(token: String) {
-        // [SRP] 기기 고유 ID를 userId로 사용
         val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
-        // [SRP] SharedPreferences에서 사용자 역할(어르신/보호자) 가져오기
-        val role = getSharedPreferences("prefs", Context.MODE_PRIVATE).getString("role", "elderly") ?: "elderly"
+        val role = com.angae.phishingdefender.BuildConfig.FLAVOR
+        
+        val hash = Math.abs(deviceId.hashCode())
+        val elderCode = (hash % 1000000).toString().padStart(6, '0')
 
         val deviceData = hashMapOf(
             "fcmToken" to token,
             "role" to role,
+            "elderCode" to elderCode,
             "updatedAt" to FieldValue.serverTimestamp()
         )
 
-        // [SRP] Firestore의 devices 컬렉션에 토큰 정보 업데이트 (중복 방지를 위해 merge 사용)
-        FirebaseFirestore.getInstance().collection("devices").document(deviceId)
+        val docId = "${deviceId}_$role"
+        FirebaseFirestore.getInstance().collection("devices").document(docId)
             .set(deviceData, SetOptions.merge())
             .addOnSuccessListener {
                 Log.d("FCM_SERVICE", "FCM 토큰 서버 업데이트 성공: $token")
             }
             .addOnFailureListener { e ->
-                // [Safety] 실패해도 앱이 죽지 않도록 로깅만 수행
                 Log.e("FCM_SERVICE", "FCM 토큰 서버 업데이트 실패", e)
             }
     }
@@ -80,10 +133,13 @@ class PhishingFcmService : FirebaseMessagingService() {
 
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("from_fcm", true)
+            putExtra("fcm_title", title)
+            putExtra("fcm_message", message)
         }
         val pendingIntent = PendingIntent.getActivity(
             this, 0, intent,
-            PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         val notification = NotificationCompat.Builder(this, channelId)

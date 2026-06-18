@@ -36,6 +36,11 @@ google-services.json
 secrets.properties
 *.env
 
+# Firebase CLI 관련
+.firebase/
+.firebaserc
+firebase-debug.log
+
 # ===== 로그/임시 =====
 *.log
 /log/

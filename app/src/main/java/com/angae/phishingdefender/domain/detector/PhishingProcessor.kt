@@ -13,13 +13,33 @@ class PhishingProcessor(
      */
     fun process(message: SmsMessage): DetectionResult {
         val results = detectors.map { it.detect(message) }
-        val isAnyPhishing = results.any { it.isPhishing }
+        return mergeResults(results)
+    }
+
+    /**
+     * 비동기 탐지기(URL 실시간 검사 등)를 포함하여 결과를 취합함.
+     */
+    suspend fun processAsync(message: SmsMessage): DetectionResult {
+        val results = detectors.map { it.detectAsync(message) }
+        return mergeResults(results)
+    }
+
+    private fun mergeResults(results: List<DetectionResult>): DetectionResult {
+        val phishingResults = results.filter { it.isPhishing }
+        val isAnyPhishing = phishingResults.isNotEmpty()
         
+        // 가장 구체적인 결과(Enum 순서상 NONE이 아닌 것)를 우선 선택
+        val primaryResult = phishingResults.firstOrNull { it.type != PhishingType.NONE } 
+            ?: phishingResults.firstOrNull() 
+            ?: DetectionResult(isPhishing = false)
+
         return DetectionResult(
             isPhishing = isAnyPhishing,
-            reason = results.filter { it.isPhishing }
-                .joinToString(", ") { it.reason }
-                .ifEmpty { "정상 메시지" },
+            type = primaryResult.type,
+            reason = phishingResults.joinToString(" / ") { it.reason }.ifEmpty { "정상 메시지" },
+            guidance = primaryResult.guidance.ifEmpty { 
+                if (isAnyPhishing) "출처가 불분명한 링크는 절대 클릭하지 마시고, 즉시 삭제하시기 바랍니다." else ""
+            },
             matched = results.flatMap { it.matched }.distinct()
         )
     }

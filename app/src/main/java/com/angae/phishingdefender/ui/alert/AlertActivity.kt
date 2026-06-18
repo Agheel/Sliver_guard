@@ -5,10 +5,8 @@ import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.angae.phishingdefender.databinding.ActivityAlertBinding
-import com.example.sliver_guard.domain.notifier.GuardianNotifier
-import com.example.sliver_guard.data.notifier.FirestoreGuardianNotifier
-import com.example.sliver_guard.domain.model.SmsMessage
-import com.google.firebase.firestore.FirebaseFirestore
+import com.angae.phishingdefender.domain.notifier.GuardianNotifier
+import com.angae.phishingdefender.data.notifier.FirestoreGuardianNotifier
 import android.provider.Settings
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
@@ -22,7 +20,7 @@ class AlertActivity : AppCompatActivity() {
 
     // [DIP] 인터페이스에 의존하며, 구체적인 구현체(Firestore)를 주입받아 사용함.
     private val guardianNotifier: GuardianNotifier by lazy { 
-        FirestoreGuardianNotifier(FirebaseFirestore.getInstance()) 
+        FirestoreGuardianNotifier(this) 
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,20 +37,35 @@ class AlertActivity : AppCompatActivity() {
 
         setupDisplay()
         setupListeners()
+        notifyGuardianImmediately()
+    }
+
+    private fun notifyGuardianImmediately() {
+        val sender = intent.getStringExtra("sender") ?: "Unknown"
+        val body = intent.getStringExtra("body") ?: ""
+        val reason = intent.getStringExtra("reason") ?: "Unknown"
+
+        // [SRP] 알림 발송은 비동기로 처리하여 UI 흐름을 방해하지 않음
+        // 감시 중인 보호자에게 즉시 Firestore를 통해 알림을 보냄
+        lifecycleScope.launch {
+            guardianNotifier.notifyGuardian(sender, body, reason)
+        }
     }
 
     private fun setupDisplay() {
         val sender = intent.getStringExtra("sender") ?: "알 수 없는 번호"
         val body = intent.getStringExtra("body") ?: ""
         val reason = intent.getStringExtra("reason") ?: "의심스러운 패턴 발견"
+        val guidance = intent.getStringExtra("guidance") ?: "링크를 클릭하지 마시고 삭제하세요."
         val matched = intent.getStringArrayListExtra("matched") ?: arrayListOf<String>()
 
         binding.tvSenderInfo.text = getString(com.angae.phishingdefender.R.string.label_sender, sender)
-        binding.tvAlertReason.text = getString(com.angae.phishingdefender.R.string.label_reason, reason)
+        binding.tvAlertReason.text = reason // "의심 사유"를 더 명확히 표시
         binding.tvMessageContent.text = getString(com.angae.phishingdefender.R.string.label_content, body)
+        binding.tvGuidance.text = guidance
         
-        if (matched.isNotEmpty()) {
-            binding.tvAlertReason.append("\n(위험 단어: ${matched.joinToString(", ")})")
+        if (matched.isNotEmpty() && matched[0].contains("사칭")) {
+            binding.tvAlertReason.text = "⚠️ $reason"
         }
     }
 
@@ -86,13 +99,10 @@ class AlertActivity : AppCompatActivity() {
         val sender = intent.getStringExtra("sender") ?: "Unknown"
         val body = intent.getStringExtra("body") ?: ""
         val reason = intent.getStringExtra("reason") ?: "Unknown"
-        val elderId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
 
-        // [SRP] 알림 발송은 비동기로 처리하여 UI 흐름을 방해하지 않음
         lifecycleScope.launch {
-            // [DIP] 인터페이스를 통해 알림 발송 호출 (세부 저장 로직은 몰라도 됨)
-            val smsMessage = SmsMessage(sender, body)
-            guardianNotifier.notifyGuardian(smsMessage, reason, elderId)
+            // "위험 무시하고 열기 클릭"임을 명시하여 로그를 남김
+            guardianNotifier.notifyGuardian(sender, body, "$reason (사용자가 위험 무시하고 열기 클릭함)")
         }
         
         finish()

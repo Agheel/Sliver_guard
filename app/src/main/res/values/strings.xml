@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">실버가드 (피싱방지)</string>
+    <!-- app_name은 build.gradle.kts의 productFlavors에서 동적으로 생성됨 -->
 
     <!-- 어르신 경고 화면용 (쉬운 한국어) -->
     <string name="alert_title">위험한 문자예요!</string>

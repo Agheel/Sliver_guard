@@ -5,4 +5,13 @@
     <color name="alert_bg_red">#D32F2F</color>
     <color name="btn_safe_green">#388E3C</color>
     <color name="btn_danger_grey">#9E9E9E</color>
+
+    <!-- Formal Guard Theme Colors -->
+    <color name="guard_navy">#0F172A</color>
+    <color name="guard_slate">#1E293B</color>
+    <color name="guard_gold">#D4AF37</color>
+    <color name="guard_silver">#94A3B8</color>
+    <color name="guard_off_white">#F8FAFC</color>
+    <color name="guard_emerald">#10B981</color>
+    <color name="guard_ruby">#EF4444</color>
 </resources>
